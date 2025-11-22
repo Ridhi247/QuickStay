@@ -1,15 +1,25 @@
-import mongoose from "mongoose";
+import { Router } from "express";
+import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
 
-const userSchema = mongoose.Schema({
-    _id: {type: String, required: true},
-    username: {type: String, required: true},
-    email: {type: String, required: true},
-    image: {type: String, required: true},
-    role: {type: String, enum: ["user", "hotelOwner"], default: "user"},
-    recentSearchedCities: [{type: String, required: true}],
-},{timestamps: true}
+const router = Router();
+
+// Protected route: get current user
+router.get(
+  "/",
+  ClerkExpressRequireAuth({ apiKey: process.env.CLERK_SECRET_KEY }),
+  (req, res) => {
+    try {
+      res.json({
+        success: true,
+        userId: req.auth.userId,
+        role: "hotelOwner", // replace with DB role if you have
+        recentSearchedCities: [], // optional
+      });
+    } catch (err) {
+      console.error("Error in /api/user:", err);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
 );
 
-const User = mongoose.model("User", userSchema);
-
-export default User;
+export default router;

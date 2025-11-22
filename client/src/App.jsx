@@ -1,41 +1,58 @@
-import React from 'react'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
-import { Route, Routes, useLocation } from 'react-router-dom'
-import Home from './pages/Home'
-import AllRooms from './pages/AllRooms' // ✅ MISSING import added
-import RoomDetails from './pages/RoomDetails'
-import MyBookings from './pages/MyBookings'
-import HotelReg from './components/HotelReg'
-import Layout from './pages/hotelOwner/Layout'
-import Dashboard from './pages/hotelOwner/Dashboard'
-import AddRoom from './pages/hotelOwner/AddRoom'
-import ListRoom from './pages/hotelOwner/ListRoom'
+import React from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import Home from "./pages/Home";
+import AllRooms from "./pages/AllRooms";
+import RoomDetails from "./pages/RoomDetails";
+import MyBookings from "./pages/MyBookings";
+import HotelReg from "./components/HotelReg";
 
+// Hotel Owner Pages
+import Layout from "./pages/hotelOwner/Layout";
+import Dashboard from "./pages/hotelOwner/Dashboard";
+import AddRoom from "./pages/hotelOwner/AddRoom";
+import ListRoom from "./pages/hotelOwner/ListRoom";
+import AddHotel from "./pages/hotelOwner/AddHotel";
+
+import { Toaster } from "react-hot-toast";
+import { useAppContext } from "./context/AppContext";
 
 const App = () => {
   const isOwnerPath = useLocation().pathname.includes("owner");
+  const { showHotelReg, isOwner } = useAppContext();
 
   return (
     <div>
-      {!isOwnerPath && <Navbar />}
-      {false && <HotelReg/>}
-      <div className='min-h-[70vh]'>
+      <Toaster />
+
+      {/* Navbar is shown only on non-owner pages */}
+      {!isOwnerPath && <Navbar key={isOwner ? "owner" : "guest"} />}
+
+      {/* Hotel registration modal */}
+      {showHotelReg && <HotelReg />}
+
+      <div className="min-h-[70vh]">
         <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/rooms' element={<AllRooms />} />
-          <Route path='/rooms/:id' element={<RoomDetails />} />
-          <Route path='/my-bookings' element={<MyBookings />} />
-          <Route path='/owner' element={<Layout/>}>
-                <Route index element={<Dashboard/>}/>
-                <Route path="add-room" element={<AddRoom/>}/>
-                <Route path="list-room" element={<ListRoom/>}/>
+          {/* Public / Guest Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/rooms" element={<AllRooms />} />
+          <Route path="/rooms/:id" element={<RoomDetails />} />
+          <Route path="/my-bookings" element={<MyBookings />} />
+
+          {/* Hotel Owner Routes */}
+          <Route path="/owner" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="add-hotel" element={<AddHotel />} />
+            <Route path="add-room" element={<AddRoom />} />
+            <Route path="list-room" element={<ListRoom />} />
           </Route>
         </Routes>
       </div>
+
       {!isOwnerPath && <Footer />}
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
